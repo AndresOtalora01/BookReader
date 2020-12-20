@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">BookReader</string>
+    <string name="page">Página</string>
+    <string name="chapter">capitulo</string>
+</resources>
