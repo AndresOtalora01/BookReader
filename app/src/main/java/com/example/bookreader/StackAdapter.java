@@ -8,6 +8,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import fragments.PageFragment;
@@ -16,7 +17,10 @@ public class StackAdapter extends FragmentPagerAdapter {
     private int charMax;
     private String content;
     private List<String> parts;
-
+    private String newPageSpacing = "\n\n\n";
+    private int txtSize = 12;
+    private List<PageFragment> pageFragmentList = new ArrayList<>();
+    // private Long totalTime = 0L;
     public StackAdapter(FragmentManager fragmentManager, int charMax, String content) {
         super(fragmentManager);
         this.charMax = charMax;
@@ -33,7 +37,10 @@ public class StackAdapter extends FragmentPagerAdapter {
     // Returns the fragment to display for that page
     @Override
     public Fragment getItem(int position) {
-        return PageFragment.newInstance(position, parts.get(position));
+        Log.d("getItem", position + "");
+        PageFragment pageFragment = PageFragment.newInstance(position, parts.get(position), txtSize);
+        pageFragmentList.add(pageFragment);
+        return pageFragment;
     }
 
     // Returns the page title for the top indicator
@@ -46,23 +53,34 @@ public class StackAdapter extends FragmentPagerAdapter {
     private List<String> getParts(String string, int partitionSize) {
         List<String> parts = new ArrayList<String>();
         int len = string.length();
-        String verificator;
+        String verifiedContent;
         int addPositions = 0;
         for (int i = 0; i < len; i += partitionSize) {
-            verificator = string.substring(i, Math.min(len, i + partitionSize));
+            verifiedContent = string.substring(i, Math.min(len, i + partitionSize));
             addPositions = 0;
 
-            while (!verificator.endsWith(" ")) {
-
-                verificator = verificator.substring(0, verificator.length() - 1);
+            while (!verifiedContent.endsWith(" ")) {
+                verifiedContent = verifiedContent.substring(0, verifiedContent.length() - 1);
                 addPositions++;
             }
 
-            parts.add(verificator);
+            for (String newLine : verifiedContent.split(newPageSpacing)) {
+                if (newLine.length() > newPageSpacing.length())
+                    parts.add(newLine);
+            }
+
             i = i - addPositions;
 
         }
         return parts;
+    }
+
+    public void setNewSize(int spSize) {
+        txtSize = spSize;
+        for (PageFragment page: pageFragmentList) {
+            page.setNewSize(spSize);
+        }
+        notifyDataSetChanged();
     }
 
 }

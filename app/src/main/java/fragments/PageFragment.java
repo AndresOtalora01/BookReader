@@ -1,6 +1,7 @@
 package fragments;
 
 import android.os.Bundle;
+import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,13 +19,15 @@ public class PageFragment extends Fragment {
     // Store instance variables
     private String content;
     private int page;
-
+    private TextView tvContent;
+    private int txtSize = 12;
     // newInstance constructor for creating fragment with arguments
-    public static PageFragment newInstance(int page, String title) {
+    public static PageFragment newInstance(int page, String title, int txtSize) {
         PageFragment fragmentFirst = new PageFragment();
         Bundle args = new Bundle();
         args.putInt("someInt", page);
         args.putString("someTitle", title);
+        args.putInt("txtSize", txtSize);
         fragmentFirst.setArguments(args);
         return fragmentFirst;
     }
@@ -35,6 +38,7 @@ public class PageFragment extends Fragment {
         super.onCreate(savedInstanceState);
         page = getArguments().getInt("someInt", 0);
         content = getArguments().getString("someTitle");
+        txtSize = getArguments().getInt("txtSize");
     }
 
 
@@ -50,13 +54,22 @@ public class PageFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         TextView tvPageNumber = (TextView) view.findViewById(R.id.tvPageNumber);
         tvPageNumber.setText(page + "");
-        TextView tvContent = (TextView) view.findViewById(R.id.tvPageContent);
+        tvContent = (TextView) view.findViewById(R.id.tvPageContent);
         tvContent.setText(content);
+        tvContent.setTextSize(txtSize);
+        tvContent.setMovementMethod(new ScrollingMovementMethod());
     }
-    public int getMeasureTv (TextView tv) {
+
+    public int getMeasureTv(TextView tv) {
         int height = tv.getMeasuredHeight();
         int width = tv.getMeasuredWidth();
         //TODO: To be implemented
         return 200;
+    }
+
+    public void setNewSize(int spSize) {
+        txtSize = spSize;
+        if (tvContent != null)
+            tvContent.setTextSize(spSize);
     }
 }

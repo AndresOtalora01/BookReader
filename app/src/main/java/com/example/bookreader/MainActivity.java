@@ -5,25 +5,19 @@ import androidx.viewpager.widget.ViewPager;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Environment;
 import android.util.Log;
-import android.widget.TextView;
+import android.widget.SeekBar;
 import android.widget.Toast;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.Timer;
-
-import fragments.PageFragment;
 
 public class MainActivity extends AppCompatActivity {
+    private SeekBar sbTextSize;
+    private StackAdapter adapterViewPager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,7 +31,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onLoaded(String result) {
                 Log.d("cacaInfo", String.valueOf(result.length()));
-                StackAdapter adapterViewPager = new StackAdapter(getSupportFragmentManager(), 600, result);
+                adapterViewPager = new StackAdapter(getSupportFragmentManager(), 600, result);
                 vpPager.setAdapter(adapterViewPager);
             }
 
@@ -47,7 +41,25 @@ public class MainActivity extends AppCompatActivity {
             }
         }).execute("https://www.gutenberg.org/cache/epub/19543/pg19543.txt");
 
+        sbTextSize = (SeekBar) findViewById(R.id.sbTextSize);
+        sbTextSize.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
 
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if (adapterViewPager != null)
+                    adapterViewPager.setNewSize(progress + 12);
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
 
     }
 
@@ -80,24 +92,24 @@ public class MainActivity extends AppCompatActivity {
                 InputStream is = urlConnection.getInputStream();
                 BufferedReader br = new BufferedReader(new InputStreamReader(is));
 
+
                 while (line != null) {
                     line = br.readLine();
                     if (line != null) {
-                        result += line ;
+                        if (line.isEmpty()) result += "\n";
+                        else result += " " + line;
                         Log.d("cacaInfo", line);
                     }
-
                 }
                 br.close();
                 return result;
-
             } catch (Exception e) {
                 Log.e("Error: ", e.getMessage());
                 listener.onFailure(e.getMessage());
             }
             return result;
-
         }
+
         /**
          * After completing background task Dismiss the progress dialog
          **/
